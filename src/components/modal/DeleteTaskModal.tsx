@@ -37,11 +37,11 @@ const DeleteTaskModal = ({ id, title, handleRefresh }: IDeleteTaskModal) => {
               <ModalHeader>Create new task</ModalHeader>
               <ModalBody>Are you sure you want to delete {title}</ModalBody>
               <ModalFooter>
-                <Button color='danger' variant='flat' onPress={onClose}>
-                  Close
+                <Button color='primary' variant='flat' onPress={onClose}>
+                  Cancel
                 </Button>
-                <Button type='submit' color='primary' onPress={onClose}>
-                  Submit
+                <Button onClick={() => deleteData(id)} color='danger' onPress={onClose}>
+                  OK
                 </Button>
               </ModalFooter>
             </>

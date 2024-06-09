@@ -11,6 +11,8 @@ import ControlPanel from '~/components/bar/ControlPanel'
 import TaskCard from '~/components/card/TaskCard'
 import { IUser } from '~/actions/auth/auth.interface'
 import { ITask } from '~/actions/tasks/task.interface'
+import { DndContext, DragEndEvent, UniqueIdentifier } from '@dnd-kit/core'
+import { Droppable } from '~/components/drag-and-drop/Droppable'
 
 export const priorityData = [
   { value: TaskPriority.LOW, label: '🟩 Low' },
@@ -25,15 +27,15 @@ export const statusData = [
 ]
 
 const TaskPage = () => {
-  // const [parent, setParent] = useState<UniqueIdentifier | null>(null)
+  const [parent, setParent] = useState<UniqueIdentifier | null>(null)
   // const draggableMarkup = <Draggable id='draggable'>Drag me</Draggable>
-  // function handleDragEnd(event: DragEndEvent) {
-  //   const { over } = event
+  function handleDragEnd(event: DragEndEvent) {
+    const { over } = event
 
-  //   // If the item is dropped over a container, set it as the parent
-  //   // otherwise reset the parent to `null`
-  //   setParent(over ? over.id : null)
-  // }
+    // If the item is dropped over a container, set it as the parent
+    // otherwise reset the parent to `null`
+    setParent(over ? over.id : null)
+  }
 
   const filterInitialData = {
     status: [
@@ -107,32 +109,39 @@ const TaskPage = () => {
           status={filterInitialData.status}
         />
         <div className='flex justify-evenly items-start p-3'>
-          {status
-            .filter((status) => status.value !== 'ALL')
-            .map((status, i) => (
-              <Card shadow='lg' style={{ minHeight: '50vh' }} key={i} className='w-3/5 bg-slate-50 mx-4 mt-10'>
-                <CardHeader>
-                  <p className='font-bold text-3xl'>{status.label}</p>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  {taskList
-                    .filter((value) => value.status === status.value)
-                    .map((value) => (
-                      <TaskCard
-                        id={value._id}
-                        handleRefresh={handleRefresh}
-                        status={value.status}
-                        priority={value.priority}
-                        title={value.title}
-                        updatedAt={value.updatedAt}
-                        description={value.description}
-                        key={value._id}
-                      />
-                    ))}
-                </CardBody>
-              </Card>
-            ))}
+          <DndContext onDragEnd={handleDragEnd}>
+            {status
+              .filter((status) => status.value !== 'ALL')
+              .map((status) => (
+                <Card
+                  shadow='lg'
+                  style={{ minHeight: '66vh' }}
+                  key={status.value}
+                  className='w-3/5 bg-slate-50 mx-4 mt-10'
+                >
+                  <CardHeader>
+                    <p className='font-bold text-3xl'>{status.label}</p>
+                  </CardHeader>
+                  <Divider />
+                  <CardBody>
+                    {taskList
+                      .filter((value) => value.status === status.value)
+                      .map((value) => (
+                        <TaskCard
+                          id={value._id}
+                          handleRefresh={handleRefresh}
+                          status={value.status}
+                          priority={value.priority}
+                          title={value.title}
+                          updatedAt={value.updatedAt}
+                          description={value.description}
+                          key={value._id}
+                        />
+                      ))}
+                  </CardBody>
+                </Card>
+              ))}
+          </DndContext>
         </div>
       </main>
     </>

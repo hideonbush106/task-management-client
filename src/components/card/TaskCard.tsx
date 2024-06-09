@@ -5,6 +5,8 @@ import { FaRegClock } from 'react-icons/fa6'
 import { TaskPriority, TaskStatus } from '~/contracts/constant'
 import TaskDetailModal from '~/components/modal/UpdateTaskDetailModal'
 import DeleteTaskModal from '../modal/DeleteTaskModal'
+import { CgDetailsMore } from 'react-icons/cg'
+import { useDraggable } from '@dnd-kit/core'
 
 interface ITaskCard {
   title: string
@@ -18,6 +20,10 @@ interface ITaskCard {
 const TaskCard = ({ title, priority, updatedAt, description, status, id, handleRefresh }: ITaskCard) => {
   const dateFormat = dayjs(updatedAt)
   const [priorityChipColor, setPriorityChipColor] = useState('')
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: id
+  })
 
   useEffect(() => {
     switch (priority) {
@@ -38,9 +44,15 @@ const TaskCard = ({ title, priority, updatedAt, description, status, id, handleR
     }
   }, [priority])
 
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      }
+    : undefined
+
   return (
     <>
-      <Card shadow='sm' className='my-2 p-5'>
+      <Card style={style} ref={setNodeRef} {...listeners} {...attributes} shadow='sm' className='my-2 p-5 z-20'>
         <CardHeader className='flex justify-between'>
           <p className='font-bold text-xl'>{title}</p>
           <div>
@@ -61,7 +73,10 @@ const TaskCard = ({ title, priority, updatedAt, description, status, id, handleR
             <FaRegClock className='text-lg' />
             <p className='ml-1'>{dateFormat.format('DD/MM/YYYY - HH:mm:ss')}</p>
           </div>
-          <p className='my-4'>{description || 'No description'}</p>
+          <div className='flex flex-rows items-center my-2'>
+            <CgDetailsMore className='text-lg' />
+            <p className='ml-1 my-4'> {description || 'No description'}</p>
+          </div>
           <Chip
             style={{
               background: priorityChipColor,
